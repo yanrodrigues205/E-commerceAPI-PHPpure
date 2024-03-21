@@ -12,6 +12,7 @@ define('DATABASE_USER', 'root');
 define('DATABASE_PASS', '');
 define('DS', DIRECTORY_SEPARATOR);
 define('DIR_APP', __DIR__);
+define('DIR_PROJECT', 'E-commerceAPI-PHPpure');
 
 if(file_exists('autoload.php'))
 {
