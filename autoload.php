@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * CLASSES A SEREM CARREGADAS
  * @param $class
