@@ -3,32 +3,43 @@
 
     use InvalidArgumentException;
     use PDO;
+    use PDOException;
+    use Error;
     use utils\GlobalConstants;
 
     class MySql
     {
-        private object $database;
+        private $database;
+        private string $db_name = DATABASE_NAME;
+        private string $db_host = DATABASE_HOST;
+        private string $db_user = DATABASE_USER;
+        private string $db_pass = DATABASE_PASS;
+
 
         public function __construct()
         {
-            $this->database = $this->setDatabase();
+            $this->database = $this->setConnection();
         }
 
         /**
          * @return PDO
          */
 
-        public function setDatabase() : mixed
+        private function setConnection()
         {
-            try
-            {
-                return new PDO(
-                    'mysql:host='.DATABASE_HOST.'; dbname='.DATABASE_NAME.';', DATABASE_USER, DATABASE_PASS
-                );
+           try
+           {
+                $pdo = new PDO("mysql:host=".$this->db_host.";dbname=".$this->db_name, $this->db_user, $this->db_pass);
+
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // ACTION error messages
+
+                $pdo->query("SELECT 1");
+
+                return $pdo;
             }
-            catch(\Exception $e)
+            catch (PDOException $e)
             {
-                throw new InvalidArgumentException();
+                throw new Error("CONNECTION ERROR: " . $e->getMessage());
             }
         }
 
