@@ -2,21 +2,23 @@
     namespace validation;
     use utils\BodyRequest;
     use utils\GlobalConstants;
+    use repositories\TokenRepository;
 
     class Request
     {
-        private array $request;
-        private array $body_request = [];
+        private $request;
+        private object $token_repository;
+        private mixed $body_request;
         const GET = 'GET';
         const DELETE = 'DELETE';
         public function __construct($request)
         {
             $this->request = $request;
+            $this->token_repository = new TokenRepository();
+
         }
 
-        /**
-         * @return string
-         */
+       
         public function processRequest()
         {
             $retorno = utf8_encode(GlobalConstants::MSG_ROUTE_ERROR);
@@ -25,8 +27,6 @@
             {
                 $retorno = $this->redirectRequest();
             }
-
-
             return $retorno;
         }
 
@@ -36,5 +36,8 @@
             {
                 $this->body_request = BodyRequest::menageRequestBody();
             }
+            $authorization = getallheaders()['Authorization'] ? getallheaders()['Authorization'] : " ";
+            $this->token_repository->validateToken($authorization);
+
         }
     }

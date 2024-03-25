@@ -118,4 +118,9 @@
             }
             throw new InvalidArgumentException("Error, Select the table and id to complete selecting a record!");
         }
+
+        public function getDB()
+        {
+            return $this->database;
+        }
     }
