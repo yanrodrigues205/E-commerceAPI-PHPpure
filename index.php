@@ -6,6 +6,8 @@
 
     try
     {
+        header('Content-Type: application/json; charset=utf-8');
+        header("Access-Control-Allow-Origin: *");
         $request_validation = new Request(Routes::getRoutes());
         $process = $request_validation->processRequest();
     }
