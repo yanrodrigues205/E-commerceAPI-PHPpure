@@ -1,6 +1,8 @@
 <?php
     namespace repositories;
     use database\MySql;
+use ErrorException;
+use Exception;
 
     class ProductRepository
     {
@@ -21,4 +23,26 @@
             return $this->database;
         }
 
+
+        public function getAllProducts() : array
+        {
+            $query = "SELECT * FROM " . $this->table;
+
+            try
+            {
+                $db = $this->database->getDB();
+                $prepare = $db->query($query);
+                $all = $prepare->fetchAll($db::FETCH_ASSOC);    
+                return $all;
+            }
+            catch(Exception $err)
+            {
+                return [
+                    "message" => "Error when searching for all '".$this->table."' ",
+                    "error" => $err
+                ];
+            }    
+
+            
+        }
     }

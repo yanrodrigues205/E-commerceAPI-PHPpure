@@ -9,7 +9,7 @@
     {
         private $request;
         private object $token_repository;
-        private mixed $body_request;
+        private $body_request = [];
         const GET = 'GET';
         const DELETE = 'DELETE';
         public function __construct($request)
@@ -36,43 +36,16 @@
             {
                 $this->body_request = BodyRequest::menageRequestBody();
             }
-            $authorization = getallheaders()['Authorization'] ? getallheaders()['Authorization'] : " "; // BEARER Authorization
-            $this->token_repository->validateToken($authorization);
+            $authorization = getallheaders()['Authorization'] ? getallheaders()['Authorization'] : "empty"; // BEARER Authorization
 
-            $method = $this->request["method"];
-
-            return $this->$method();
-        }
-
-
-        private function get() : void
-        {
-
-            if(in_array($this->request['route'], GlobalConstants::REQUEST_GET))
+            if($this->request['route'] != "PRODUCTS" && $this->request['resourse'] != "GETALL")
             {
-                self::callController();
-            }
-            else
-            {
-                header("HTTP/1.0 404 Not Found");
-                $message = [
-                    "message" => "This route does not exist within the application!",
-                    "status" => 404
-                ];
-                echo json_encode($message);
-                exit;
+                $this->token_repository->validateToken($authorization);
             }
 
-        }
-
-        private function post()
-        {
-            echo "passou post!";
-        }
-
-        private function put()
-        {
-            echo "passou put!";
+            $this->request["method"];
+            self::callController();
+            
         }
 
         private function callController() : void
@@ -85,12 +58,23 @@
             {
                 $controller = "controllers\\".$controller_name;
                 $method = $this->request['resource'];
-                $obj = new $controller();
-                $call_method = $obj->$method();
-            }
-            else
-            {
-                echo "não achou o arquivo!";
+                $obj = new $controller($this->body_request);
+
+                if(method_exists($obj, $method))
+                {
+                    $call = $obj->$method($this->request['method']);
+                }
+                else
+                {
+                    header("HTTP/1.0 404 Not Found");
+                    $message = [
+                        "message" => "This route does not exist within the application!",
+                        "status" => 404
+                    ];
+                    echo json_encode($message);
+                    exit;
+                }
+
             }
         }
     }
