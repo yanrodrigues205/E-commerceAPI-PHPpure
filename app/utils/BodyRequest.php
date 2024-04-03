@@ -4,6 +4,10 @@
 
     class BodyRequest
     {
+
+        /**
+         * @return array|mixed
+         */
         public static function menageRequestBody()
         {
             try

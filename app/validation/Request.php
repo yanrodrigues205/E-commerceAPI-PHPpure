@@ -3,19 +3,18 @@
     use controllers\ProductsController;
     use utils\BodyRequest;
     use utils\GlobalConstants;
-    use repositories\TokenRepository;
-
+    use controllers\TokenController;
     class Request
     {
         private $request;
-        private object $token_repository;
+        private object $token_controller;
         private $body_request = [];
         const GET = 'GET';
         const DELETE = 'DELETE';
         public function __construct($request)
         {
             $this->request = $request;
-            $this->token_repository = new TokenRepository();
+            $this->token_controller = new TokenController();
 
         }
 
@@ -40,7 +39,7 @@
 
             if($this->request['route'] != "PRODUCTS" && $this->request['resourse'] != "GETALL")
             {
-                $this->token_repository->validateToken($authorization);
+                $this->token_controller->verifyToken($authorization);
             }
 
             $this->request["method"];
