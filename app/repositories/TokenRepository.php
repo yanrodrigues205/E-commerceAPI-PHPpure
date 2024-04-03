@@ -22,13 +22,13 @@
 
         public function validateToken(string $token)
         {
-            // $token = str_replace([" ", "Bearer"], "", $token);
-
             if(!empty($token))
             {
-                $query = "SELECT id, value, expiry, user_id, created_at, updated_at FROM " . $this->table . " WHERE value = :token ";
+                $data_atual = date("Y-m-d H:i:s");
+                $query = "SELECT id, value, expiry, user_id, created_at, updated_at FROM " . $this->table . " WHERE value = :token AND created_at <= :data_atual AND expiry >= :data_atual LIMIT 1";
                 $result = $this->database->getDB()->prepare($query);
                 $result->bindParam(':token', $token);
+                $result->bindParam(':data_atual', $data_atual, PDO::PARAM_STR);
                 $result->execute();
 
                 $results = $result->fetchAll(PDO::FETCH_ASSOC);                     
@@ -41,4 +41,3 @@
             return $results;
         }
     }
-?>
