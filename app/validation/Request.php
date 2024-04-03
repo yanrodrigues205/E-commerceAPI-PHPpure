@@ -1,6 +1,5 @@
 <?php
     namespace validation;
-    use controllers\ProductsController;
     use utils\BodyRequest;
     use utils\GlobalConstants;
     use controllers\TokenController;
@@ -42,7 +41,7 @@
                 $this->token_controller->verifyToken($authorization);
             }
 
-            $this->request["method"];
+            // $this->request["method"];
             self::callController();
             
         }
@@ -51,14 +50,13 @@
         {
             $controller = ucfirst(strtolower($this->request['route']));
             $controller_name =  $controller . "Controller";
-            $sla = __DIR__ ."/../controllers/". $controller_name . ".php";
-            $file = $sla;
-            if(file_exists($file))
+            $controller = "controllers\\".$controller_name;
+
+            if(class_exists($controller))
             {
-                $controller = "controllers\\".$controller_name;
                 $method = $this->request['resource'];
                 $obj = new $controller($this->body_request);
-
+                
                 if(method_exists($obj, $method))
                 {
                     $call = $obj->$method($this->request['method']);
@@ -73,7 +71,16 @@
                     echo json_encode($message);
                     exit;
                 }
-
+            }
+            else
+            {
+                header("HTTP/1.0 404 Not Found");
+                $message = [
+                    "message" => "This route does not exist within the application!",
+                    "status" => 404
+                ];
+                echo json_encode($message);
+                exit;
             }
         }
     }
