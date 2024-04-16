@@ -1,6 +1,7 @@
 <?php
     namespace repositories;
     use database\MySql;
+    use Exception;
     use PDO;
 
     class TokenRepository
@@ -39,5 +40,24 @@
             }
 
             return $results;
+        }
+
+
+        public function insertToken(string $uuid) 
+        {
+            $query = "INSERT INTO `" .$this->table . "`
+                ( value ) VALUES ( :value )";
+            try
+            {
+                $result = $this->database->getDB()->prepare($query);
+                $result->bindParam(":value", $uuid);
+                $results = $result->execute();
+                
+                return $results;
+            }
+            catch(Exception $err)
+            {
+                echo "New exeption in UserRepository, Exception => ".$err;
+            }
         }
     }
