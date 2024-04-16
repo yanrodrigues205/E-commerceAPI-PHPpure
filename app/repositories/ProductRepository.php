@@ -1,8 +1,7 @@
 <?php
     namespace repositories;
     use database\MySql;
-use ErrorException;
-use Exception;
+    use Exception;
 
     class ProductRepository
     {
@@ -44,5 +43,37 @@ use Exception;
             }    
 
             
+        }
+
+
+        /**
+         * @param array $data
+         * @return array $result
+         */
+
+        public function insertProduct(array $data) : mixed
+        {
+            $query = "INSERT INTO " . $this->table . "(name, description, value, amount, img_path) VALUES (:name, :description, :value, :amount, :img_path) ";
+
+            try
+            {
+                $db = $this->database->getDB();
+                $prepare = $db->prepare($query);
+                $prepare->bindParam(":name", $data["name"]);
+                $prepare->bindParam(":description", $data["description"]);
+                $prepare->bindParam(":value", $data["value"]);
+                $prepare->bindParam(":amount", $data["amount"]);
+                $prepare->bindParam(":img_path", $data["img_path"]);
+                $result = $prepare->execute();
+                return $result;
+
+            }
+            catch(Exception $err)
+            {
+                echo "New exception in ProductRepository, Exception => ".$err;
+                
+            }
+
+
         }
     }
