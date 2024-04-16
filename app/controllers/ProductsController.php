@@ -16,7 +16,7 @@
 
 
         /**
-         * @param string $method = GET|POST|PUT|DELETE...
+         * @param string $request_method = GET|POST|PUT|DELETE...
          */
         
         public function getall($request_method) : void
@@ -34,11 +34,42 @@
             $this->method = "POST";
             self::verifyMethod($request_method, $this->method);
 
-            echo json_encode([
-                "message" => "chegou no controller certo, metodo POST e está com tokem de autorização",
-                "status" => 202
-            ]);
+            if(empty($this->dados['name']) || empty($this->dados['description']) || empty($this->dados['value']) || empty($this->dados['amount']) || empty($this->dados['img_path']))
+            {
+                header("HTTP/1.1 400 Bad Request");
+                $message = [
+                    "message" => "To complete the precise insertion of the fields (name, description, value, amount, img_path).",
+                    "status" => 400
+                ];
+            }
+            else
+            {
+                $result = $this->product_model->insert($this->dados['name'], $this->dados['description'], $this->dados['value'], intval($this->dados['amount']), $this->dados['img_path']);
+                
+                if($result)
+                {
+                    header('HTTP/1.1 200 OK');
+                    $message = [
+                        "message" => "Product added successfully!",
+                        "status" => 200
+                    ];
+                }
+                else
+                {
+                    header('HTTP/1.1 422 Unprocessable Entity');
+                    $message = [
+                        "message" => "Unable to complete product registration!",
+                        "status" => 422
+                    ];
+                }
+            }
+
+            echo json_encode($message);
+            exit;
+            
+           
         }
+
 
 
         private function verifyMethod(string $request_method,string $method) : void
