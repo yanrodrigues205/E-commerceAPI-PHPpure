@@ -88,8 +88,8 @@
                         id,
                         name,
                         email,
-                        password, 
-                        created_at, 
+                        password,
+                        created_at,
                         updated_at
                     FROM 
                         users
@@ -105,8 +105,10 @@
                 $prepare->bindParam(":password", $data["password"]);
 
                 $result = $prepare->execute();
-                if($result)
-                    return $result;
+                $all = $prepare->fetchAll($db::FETCH_OBJ);
+   
+                if(count($all) > 0)
+                    return $all;
                 else
                     return false;
                 

@@ -36,7 +36,10 @@
             }
             $authorization = getallheaders()['Authorization'] ? getallheaders()['Authorization'] : "empty"; // BEARER Authorization
 
-            if($this->request['route'] != "PRODUCTS" && $this->request['resourse'] != "GETALL")
+            $free_controllers = [ "USERS", "PRODUCTS"];
+            $free_methods = ["GETALL", "ADD", "SIGNIN"];
+            
+            if(!in_array($this->request['route'], $free_controllers) || !in_array($this->request['resources'], $free_methods))
             {
                 $this->token_controller->verifyToken($authorization);
             }

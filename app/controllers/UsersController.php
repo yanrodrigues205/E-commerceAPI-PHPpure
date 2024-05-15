@@ -1,11 +1,13 @@
 <?php
     namespace controllers;
     use models\UsersModel;
+    use models\TokenModel;
     use services\ResponseService;
 
     class UsersController
     {
         private object $user_model;
+        private object $tokens_model;
         private $dados;
         private ?string $method;
 
@@ -13,13 +15,14 @@
         {
             $this->dados = $dados;
             $this->user_model = new UsersModel();
+            $this->tokens_model = new TokenModel();
         }
 
         /**
          * @param string $request_method = GET|POST|PUT|DELETE...
          */
 
-        public function insert($request_method) : void
+        public function add($request_method) : void
         {
             $this->method = "POST";
             self::verifyMethod($request_method, $this->method);
@@ -60,6 +63,63 @@
                     );
                 }
             }
+
+        }
+
+        public function signin($request_method):void
+        {
+            $this->method = "POST";
+            self::verifyMethod($request_method, $this->method);
+
+            if(empty($this->dados['email']) || empty($this->dados['password']))
+            {
+                ResponseService::send(
+                    "Fill in all fields to log in (email and password)",
+                    422
+                );
+            }
+
+            $verifyCredentials = $this->user_model->verifyingCredentials($this->dados['email'], $this->dados['password']);
+
+            if(!$verifyCredentials)
+            {
+                ResponseService::send(
+                    "Email or password are invalid, try again!",
+                    422
+                );
+            }
+
+
+            if(empty($verifyCredentials[0]->id))
+            {
+                ResponseService::send(
+                    "Email or password are invalid, try again!",
+                    422
+                );
+            }
+        
+            $create_token = $this->tokens_model->insert($verifyCredentials[0]->id);
+
+            if($create_token)
+            {
+                header("HTTP/1.1 200 OK");
+                $message = [
+                    "message" => "User logged in successfully!",
+                    "status" => 200,
+                    "token" => $create_token
+                ];
+                echo json_encode($message);
+                exit;
+
+            }
+            else
+            {
+                ResponseService::send(
+                    "Internal token creation error",
+                    422
+                );
+            }
+           
 
         }
 

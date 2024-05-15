@@ -43,17 +43,24 @@
         }
 
 
-        public function insertToken(string $uuid) 
+        public function insertToken(string $uuid, int $user_id) 
         {
             $query = "INSERT INTO `" .$this->table . "`
-                ( value ) VALUES ( :value )";
+                ( value, user_id ) VALUES ( :value, :user_id )";
             try
             {
                 $result = $this->database->getDB()->prepare($query);
                 $result->bindParam(":value", $uuid);
+                $result->bindParam(":user_id", $user_id);
                 $results = $result->execute();
-                
-                return $results;
+                if($results)
+                {
+                    return $uuid;
+                }
+                else
+                {
+                    return $false;
+                }
             }
             catch(Exception $err)
             {

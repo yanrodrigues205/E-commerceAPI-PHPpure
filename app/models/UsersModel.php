@@ -32,8 +32,8 @@
         public function verifyingCredentials(string $email, string $password)
         {
             $data = [
-                $email,
-                md5($password)
+                "email" => $email,
+                "password" => md5($password)
             ];
 
             return $this->repository->verifyUser($data);
