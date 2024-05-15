@@ -40,4 +40,21 @@
                 return false;
             }
         }
+
+
+
+        public function existsProduct(int $id) : bool
+        {
+            $verify = $this->repository->getOneByID($id);
+
+            if(count($verify) == 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false; 
+            }
+            
+        }
     }

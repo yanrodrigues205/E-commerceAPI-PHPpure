@@ -76,4 +76,25 @@
 
 
         }
+
+
+        public function getOneByID(int $id) : mixed
+        {
+            $query = "SELECT * FROM `".$this->table."` WHERE id = :id ";
+            try
+            {
+                $db = $this->database->getDB();
+                $prepare = $db->prepare($query);
+                $prepare->bindParam(":id", $id);
+                $prepare->execute();
+                $all = $prepare->fetchAll($db::FETCH_ASSOC);    
+                
+                return $all;
+
+            }
+            catch(Exception $err)
+            {
+                echo "New exception in ProductRepository, Exception => ".$err;
+            }
+        }
     }
