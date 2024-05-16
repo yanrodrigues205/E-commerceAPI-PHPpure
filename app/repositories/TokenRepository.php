@@ -59,7 +59,7 @@
                 }
                 else
                 {
-                    return $false;
+                    return false;
                 }
             }
             catch(Exception $err)
