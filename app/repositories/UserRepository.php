@@ -23,6 +23,34 @@
             return $this->database;
          }
 
+         public function getOneByID(int $id) : mixed
+         {
+             $query = "SELECT * FROM `".$this->table."` WHERE id = :id ";
+             try
+             {
+                 $db = $this->database->getDB();
+                 $prepare = $db->prepare($query);
+                 $prepare->bindParam(":id", $id);
+                 $prepare->execute();
+                 $all = $prepare->fetchAll($db::FETCH_OBJ);    
+                 
+                 if(count($all) > 0)
+                 {
+                    return $all;
+                 }
+                 else
+                 {
+                    return false;
+                 }
+ 
+             }
+             catch(Exception $err)
+             {
+                 echo "New exception in ProductRepository, Exception => ".$err;
+                 return false;
+             }
+         }
+
          public function insertUser(array $data) : mixed
          {
             $query = "INSERT INTO `".$this->table."`

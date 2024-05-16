@@ -29,6 +29,12 @@
             return $this->repository->existsEmail($email);
         }
 
+
+        public function getUserById(int $id)
+        {
+            return $this->repository->getOneByID($id);
+        }
+
         public function verifyingCredentials(string $email, string $password)
         {
             $data = [
