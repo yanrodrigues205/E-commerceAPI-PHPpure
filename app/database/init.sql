@@ -23,12 +23,36 @@ CREATE TABLE IF NOT EXISTS products(
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `name` VARCHAR(300) NOT NULL,
     `description` VARCHAR(500) NOT NULL,
-    `value` VARCHAR(10) NOT NULL,
+    `value` DOUBLE NOT NULL,
     `amount` INT NOT NULL,
     `img_path` LONGBLOB NOT NULL,
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+
+CREATE TABLE IF NOT EXISTS sales(
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` INT NOT NULL,
+    `payament` ENUM("Pix", "Crédito", "Débito", "Boleto Bancário", "Cheque"),
+    `total_price` DOUBLE,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES users (`id`)
+);
+
+CREATE TABLE IF NOT EXISTS sales_products(
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `product_id` INT NOT NULL,
+    `sales_id` INT NOT NULL,
+    `amount` INT NOT NULL,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`sales_id`) REFERENCES sales (`id`),
+    FOREIGN KEY (`product_id`) REFERENCES products (`id`)
+
+);
+
 DELIMITER //
 CREATE TRIGGER IF NOT EXISTS expiry_insert_tokens
 BEFORE INSERT ON tokens
