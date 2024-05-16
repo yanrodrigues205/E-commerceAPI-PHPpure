@@ -38,8 +38,9 @@
 
             $free_controllers = [ "USERS", "PRODUCTS"];
             $free_methods = ["GETALL", "ADD", "SIGNIN"];
+            $verify = false;
             
-            if(!in_array($this->request['route'], $free_controllers) || !in_array($this->request['resources'], $free_methods))
+            if(!in_array($this->request['route'], $free_controllers) || !in_array($this->request['resource'], $free_methods))
             {
                 $this->token_controller->verifyToken($authorization);
             }
