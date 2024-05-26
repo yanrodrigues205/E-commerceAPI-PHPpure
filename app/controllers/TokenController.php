@@ -1,11 +1,12 @@
 <?php
     namespace controllers;
     use models\TokenModel;
-    class TokenController
+    use services\ResponseService;
+    class TokenController extends TokenModel
     {
-        private $token_model;
-        public  function __construct() {
-            $this->token_model = new TokenModel();
+        public  function __construct()
+        {
+            parent::__construct();
         }
 
 
@@ -15,28 +16,22 @@
 
             if(!empty($token) && $token !== "empty")
             {
-                $result = $this->token_model->verify($token);
+                $result = self::verify($token);
 
                 if(count($result) !== 1 OR $result == false)
                 {
-                    header("HTTP/1.1 401 Unauthorized");
-                    $response = [
-                        "message" => "NAO AUTORIZADO!",
-                        "status" => 401
-                    ];
-                    echo json_encode($response);
-                    exit;
+                    ResponseService::send(
+                        "Session expired, try logging in again, we are sorry for the inconvenience.",
+                        401
+                    );
                 }
             }
             else
             {
-                header("HTTP/1.1 401 Unauthorized");
-                $response = [
-                    "message" => "You sent something invalid or left the access token empty!",
-                     "status" => 401
-                ];
-                echo json_encode($response);
-                exit;
+                ResponseService::send(
+                    "You sent something invalid or left the access token empty!",
+                    401
+                );
             }
         }
 

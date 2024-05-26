@@ -4,18 +4,17 @@
     use models\TokenModel;
     use services\ResponseService;
 
-    class UsersController
+    class UsersController extends UsersModel
     {
-        private object $user_model;
-        private object $tokens_model;
         private $dados;
+        private TokenModel $token_model;
         private ?string $method;
 
         public function __construct($dados = [])
         {
             $this->dados = $dados;
-            $this->user_model = new UsersModel();
-            $this->tokens_model = new TokenModel();
+            $this->token_model = new TokenModel();
+            parent::__construct();
         }
 
         /**
@@ -36,8 +35,8 @@
             }
             else
             {
-                $existsEmail = $this->user_model->existsEmail($this->dados['email']);
-                
+                $existsEmail = self::existsEmail($this->dados['email']);
+
                 if($existsEmail)
                 {
                     ResponseService::send(
@@ -46,7 +45,7 @@
                     );
                 }
 
-                $insert = $this->user_model->insert($this->dados['name'], $this->dados['email'], $this->dados['password']);
+                $insert = self::insert($this->dados['name'], $this->dados['email'], $this->dados['password']);
 
                 if($insert)
                 {
@@ -79,7 +78,7 @@
                 );
             }
 
-            $verifyCredentials = $this->user_model->verifyingCredentials($this->dados['email'], $this->dados['password']);
+            $verifyCredentials = self::verifyingCredentials($this->dados['email'], $this->dados['password']);
 
             if(!$verifyCredentials)
             {
@@ -97,8 +96,8 @@
                     422
                 );
             }
-        
-            $create_token = $this->tokens_model->insert($verifyCredentials[0]->id);
+
+            $create_token = $this->token_model->insert($verifyCredentials[0]->id);
 
             if($create_token)
             {
@@ -119,7 +118,6 @@
                     422
                 );
             }
-           
 
         }
 
@@ -134,5 +132,5 @@
             }
         }
 
-        
+
     }

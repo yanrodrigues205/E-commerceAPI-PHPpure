@@ -5,23 +5,22 @@
     use models\SalesModel;
     use models\UsersModel;
     use services\ResponseService;
-    class SalesController
+    class SalesController extends SalesModel
     {
-        private object $sales_products_model;
-        private object $products_model;
-        private object $sales_model;
-        private object $users_model;
+        private ProductsModel $products_model;
+        private SalesProductsModel $sales_products_model;
+        private UsersModel $users_model;
         private $dados;
 
         private ?string $method;
 
-        public  function __construct($dados = []) 
+        public  function __construct($dados = [])
         {
             $this->dados = $dados;
             $this->sales_products_model = new SalesProductsModel();
             $this->products_model = new ProductsModel();
-            $this->sales_model = new SalesModel();
             $this->users_model = new UsersModel();
+            parent::__construct();
 
         }
 
@@ -50,7 +49,7 @@
 
 
 
-            $insert = $this->sales_model->insert($this->dados['user_id']);
+            $insert = self::insert($this->dados['user_id']);
 
             if(!$insert)
             {
@@ -65,7 +64,6 @@
                 200
             );
 
-            
 
         }
 
@@ -94,7 +92,7 @@
             }
 
 
-            $verifySales_id = $this->sales_model->existsSales($this->dados['sales_id']);
+            $verifySales_id = self::existsSales($this->dados['sales_id']);
 
             if(!$verifySales_id)
             {

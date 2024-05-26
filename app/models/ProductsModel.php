@@ -1,60 +1,90 @@
 <?php
     namespace models;
-    use repositories\ProductRepository;
+    use PDO;
+    use database\MySql;
+    use Exception;
 
     class ProductsModel
     {
-        private object $repository;
+        private PDO $database;
+        private string $table;
 
         public function __construct()
         {
-            $this->repository = new ProductRepository();    
+            /**
+             * @name {MySql} - connection to database
+             * @value singleton connector
+             * @default MySql
+             */
+            $this->database = MySql::getInstance()->getConnector();
+ 
+            /**
+             * @var string - table, reference to database
+             */
+            $this->table = "products";
         }
 
-        public function getall() : array
+        protected function AllProducts() : array
         {
-            return $this->repository->getAllProducts();
-        }
+            $query = "SELECT * FROM " . $this->table;
 
-        public function insert(string $name, string $description, string $value, int $amount, string $img_path) :mixed
-        {
-            if(getimagesize($img_path))
+            try
             {
-                $get_image = file_get_contents($img_path);
-                $extension = pathinfo($img_path, PATHINFO_EXTENSION);
-                $base64 = base64_encode($get_image);
-                $encoded = "data:image/" . $extension . ";base64," . $base64;
-
-                $data = [
-                    "name" => $name,
-                    "description" => $description,
-                    "value" => $value,
-                    "amount" => $amount,
-                    "img_path" => $encoded
-                ];
-
-                return $this->repository->insertProduct($data); 
+                $prepare = $this->database->query($query);
+                $all = $prepare->fetchAll($this->database::FETCH_ASSOC);
+                return $all;
             }
-            else
+            catch(Exception $err)
             {
+                return [
+                    "message" => "Error when searching for all '".$this->table."' ",
+                    "error" => $err
+                ];
+            }
+        }
+
+        protected function insertProduct(string $name, string $description, string $value, int $amount, string $img_path) : bool
+        {
+            $query = "INSERT INTO " . $this->table . "(name, description, value, amount, img_path) VALUES (:name, :description, :value, :amount, :img_path) ";
+
+            try
+            {
+                $prepare = $this->database ->prepare($query);
+                $prepare->bindParam(":name", $name);
+                $prepare->bindParam(":description", $description);
+                $prepare->bindParam(":value", $value);
+                $prepare->bindParam(":amount", $amount);
+                $prepare->bindParam(":img_path", $img_path);
+                $result = $prepare->execute();
+                return $result;
+
+            }
+            catch(Exception $err)
+            {
+                echo "New exception in ProductRepository, Exception => ".$err;
                 return false;
             }
         }
 
-
-
-        public function existsProduct(int $id) : bool
+        public function existsProduct(int $id) : mixed
         {
-            $verify = $this->repository->getOneByID($id);
+            $query = "SELECT * FROM `".$this->table."` WHERE id = :id ";
+            try
+            {
+                $prepare = $this->database->prepare($query);
+                $prepare->bindParam(":id", $id);
+                $prepare->execute();
+                $all = $prepare->fetchAll($this->database::FETCH_ASSOC);
 
-            if(count($verify) == 1)
-            {
-                return true;
+                if(count($all) > 0)
+                    return true;
+                else
+                    return false;
             }
-            else
+            catch(Exception $err)
             {
-                return false; 
+                echo "New exception in ProductRepository, Exception => ".$err;
+                return false;
             }
-            
         }
     }
