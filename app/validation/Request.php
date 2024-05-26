@@ -3,6 +3,7 @@
     use utils\BodyRequest;
     use utils\GlobalConstants;
     use controllers\TokenController;
+    use factories\ControllerFactory;
     class Request
     {
         private $request;
@@ -38,53 +39,12 @@
 
             $free_controllers = [ "USERS", "PRODUCTS"];
             $free_methods = ["GETALL", "ADD", "SIGNIN"];
-            $verify = false;
-            
+
             if(!in_array($this->request['route'], $free_controllers) || !in_array($this->request['resource'], $free_methods))
             {
                 $this->token_controller->verifyToken($authorization);
             }
 
-            // $this->request["method"];
-            self::callController();
-            
-        }
-
-        private function callController() : void
-        {
-            $controller = ucfirst(strtolower($this->request['route']));
-            $controller_name =  $controller . "Controller";
-            $controller = "controllers\\".$controller_name;
-
-            if(class_exists($controller))
-            {
-                $method = $this->request['resource'];
-                $obj = new $controller($this->body_request);
-                
-                if(method_exists($obj, $method))
-                {
-                    $call = $obj->$method($this->request['method']);
-                }
-                else
-                {
-                    header("HTTP/1.0 404 Not Found");
-                    $message = [
-                        "message" => "This route does not exist within the application!",
-                        "status" => 404
-                    ];
-                    echo json_encode($message);
-                    exit;
-                }
-            }
-            else
-            {
-                header("HTTP/1.0 404 Not Found");
-                $message = [
-                    "message" => "This route does not exist within the application!",
-                    "status" => 404
-                ];
-                echo json_encode($message);
-                exit;
-            }
+            ControllerFactory::callController($this->request["route"], $this->request["resource"],$this->request["method"], $this->body_request);
         }
     }
