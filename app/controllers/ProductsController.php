@@ -1,9 +1,8 @@
 <?php
     namespace controllers;
     use models\ProductsModel;
-    class ProductsController
+    class ProductsController extends ProductsModel
     {
-        private object $product_model;
         private $dados;
 
         private ?string $method;
@@ -11,20 +10,20 @@
         public function __construct($dados = [])
         {
             $this->dados = $dados;
-            $this->product_model = new ProductsModel();
+            parent::__construct();
         }
 
 
         /**
          * @param string $request_method = GET|POST|PUT|DELETE...
          */
-        
+
         public function getall($request_method) : void
         {
             $this->method = "GET";
             self::verifyMethod($request_method, $this->method);
-                
-            $get = $this->product_model->getall();
+
+            $get = self::AllProducts();
             echo json_encode($get);
 
         }
@@ -44,8 +43,8 @@
             }
             else
             {
-                $result = $this->product_model->insert($this->dados['name'], $this->dados['description'], $this->dados['value'], intval($this->dados['amount']), $this->dados['img_path']);
-                
+                $result = self::insertProduct($this->dados['name'], $this->dados['description'], $this->dados['value'], intval($this->dados['amount']), $this->dados['img_path']);
+
                 if($result)
                 {
                     header('HTTP/1.1 200 OK');

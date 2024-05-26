@@ -1,36 +1,70 @@
 <?php
     namespace models;
-    use repositories\SalesRepository;
-
+    use PDO;
+    use Exception;
+    use database\MySql;
     class SalesModel
     {
-        private $repository;
+        private PDO $database;
+        private string $table;
 
-        public function __construct()
+        protected function __construct()
         {
-            $this->repository = new SalesRepository();
+            /**
+             * @name {MySql} - connection to database
+             * @value singleton connector
+             * @default MySql
+             */
+            $this->database = MySql::getInstance()->getConnector();
+
+            /**
+             * @var string - table, reference to database
+             */
+             $this->table = "sales";
         }
 
-        public function existsSales(int $id) 
+        protected function existsSales(int $id)
         {
-            $verify = $this->repository->getOneByID($id);
+            $query = "SELECT * FROM `".$this->table."` WHERE id = :id ";
+            try
+            {
+                $prepare = $this->database->prepare($query);
+                $prepare->bindParam(":id", $id);
+                $prepare->execute();
+                $all = $prepare->fetchAll($this->database::FETCH_ASSOC);
 
-            if(count($verify) == 1)
-            {
-                return true;
+                if(count($all) == 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
             }
-            else
+            catch(Exception $err)
             {
-                return false; 
+                echo "New exception in ProductRepository, Exception => ".$err;
             }
         }
 
-        public function insert(int $user_id) 
+        protected function insert(int $user_id)
         {
-            $data = [
-                "user_id" => $user_id
-            ];
+            $query = "INSERT INTO `" .$this->table . "`
+            ( user_id ) VALUES ( :user_id)";
+            try
+            {
+                $result = $this->database->prepare($query);
+                $result->bindParam(":user_id", $user_id);
+                $results = $result->execute();
 
-            return $this->repository->insertSales($data);
+                return $results;
+            }
+            catch(Exception $err)
+            {
+                echo "New exeption in Sales Repository, Exception => ".$err;
+                return false;
+            }
         }
     }
