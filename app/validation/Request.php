@@ -45,6 +45,11 @@
                 $this->token_controller->verifyToken($authorization);
             }
 
-            ControllerFactory::callController($this->request["route"], $this->request["resource"],$this->request["method"], $this->body_request);
+            if(!$this->request["id"])
+            {
+                $this->request['id'] = 0;
+            }
+
+            ControllerFactory::callController($this->request["route"], $this->request["resource"],$this->request["method"], $this->body_request, $this->request["id"]);
         }
     }
