@@ -9,8 +9,7 @@
         private PDO $database;
         private string $table;
 
-
-        public function __construct()
+        protected function __construct()
         {
            /**
              * @name {MySql} - connection to database
@@ -25,9 +24,8 @@
              $this->table = "sales_products";
         }
 
-        public function insert(int $product_id, int $sales_id, int $amount)
+        protected function insertSalesProducts(int $product_id, int $sales_id, int $amount) : bool
         {
-            new self();
             $query = "INSERT INTO `" .$this->table . "`
             ( product_id, sales_id, amount ) VALUES ( :product_id, :sales_id, :amount )";
             try
@@ -38,14 +36,113 @@
                 $result->bindParam(":amount", $amount);
                 $results = $result->execute();
 
-                if($results)
-                    return $results;
-                else
-                    return false;
+                return $results;
             }
             catch(Exception $err)
             {
-                echo "New exeption in Sales Products Repository, Exception => ".$err;
+                echo "New Exeption Error in SalesProductsModel => ".$err;
+                return false;
+            }
+        }
+
+        protected function salesProductsUpdate(int | false $product_id, int | false $sales_id, int | false $amount, int | false $sales_products_id) : bool
+        {
+            $data =[];
+
+            if(!empty($product_id))
+            {
+                $data["product_id"] = $product_id;
+            }
+
+            if(!empty($amount))
+            {
+                $data["amount"] = $amount;
+            }
+
+            if(!empty($sales_id))
+            {
+                $data["sales_id"] = $sales_id;
+            }
+
+            $query = "UPDATE ".$this->table." SET ";
+
+            $i =0;
+
+            foreach($data as $key_array => $value_array)
+            {
+                if($i == 1)
+                    $query .= " ,";
+                $query .= $key_array." = :".$key_array;
+                $i = 1;
+            }
+
+            $query .= " WHERE id = :id";
+            try
+            {
+                $prepare = $this->database ->prepare($query);
+
+                foreach($data as $key_array => $value_array)
+                {
+                    $prepare->bindParam(":".$key_array, $value_array);
+                }
+                $prepare->bindParam(":id", $sales_products_id);
+                $result = $prepare->execute();
+                return $result;
+            }
+            catch(Exception $err)
+            {
+                echo "New Exeption Error in SalesProductsModel => ".$err;
+                return false;
+            }
+        }
+
+        protected function deleteById(int $sales_products_id)
+        {
+            $query = "DELETE FROM `".$this->table."` WHERE id = :id";
+            try
+            {
+                $prepare = $this->database ->prepare($query);
+                $prepare->bindParam(":id", $sales_products_id);
+                $result = $prepare->execute();
+                return $result;
+            }
+            catch(Exception $err)
+            {
+                echo "New Exeption Error in SalesProductsModel => ".$err;
+                return false;
+            }
+        }
+
+        public function getAllSalesProductBySalesID(int $sales_id) : array | false
+        {
+            $query = "SELECT * FROM `".$this->table."` WHERE sales_id = :sales_id";
+            try
+            {
+                $prepare = $this->database ->prepare($query);
+                $prepare->bindParam(":sales_id", $sales_id);
+                $result = $prepare->execute();
+                return $result;
+            }
+            catch(Exception $err)
+            {
+                echo "New Exeption Error in SalesProductsModel => ".$err;
+                return false;
+            }
+        }
+
+        public function getOneSalesProductByID(int $sales_products_id) : array | false
+        {
+            $query = "SELECT * FROM `".$this->table."` WHERE id = :id";
+            try
+            {
+                $prepare = $this->database ->prepare($query);
+                $prepare->bindParam(":id", $sales_products_id);
+                $result = $prepare->execute();
+                return $result;
+            }
+            catch(Exception $err)
+            {
+                echo "New Exeption Error in SalesProductsModel => ".$err;
                 return false;
             }
         }

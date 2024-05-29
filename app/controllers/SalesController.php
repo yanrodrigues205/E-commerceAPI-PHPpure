@@ -1,14 +1,10 @@
 <?php
     namespace controllers;
-    use models\SalesProductsModel;
-    use models\ProductsModel;
     use models\SalesModel;
     use models\UsersModel;
     use services\ResponseService;
     class SalesController extends SalesModel
     {
-        private ProductsModel $products_model;
-        private SalesProductsModel $sales_products_model;
         private UsersModel $users_model;
         private $dados;
 
@@ -17,15 +13,13 @@
         public  function __construct($dados = [])
         {
             $this->dados = $dados;
-            $this->sales_products_model = new SalesProductsModel();
-            $this->products_model = new ProductsModel();
             $this->users_model = new UsersModel();
             parent::__construct();
 
         }
 
 
-        public function insert_sale($request_method) : void
+        public function insert($request_method) : void
         {
             $this->method = "POST";
             self::verifyMethod($request_method, $this->method);
@@ -49,7 +43,7 @@
 
 
 
-            $insert = self::insert($this->dados['user_id']);
+            $insert = self::insertSales($this->dados['user_id']);
 
             if(!$insert)
             {
@@ -68,57 +62,7 @@
         }
 
 
-        public function insert_sales_product($request_method) : void
-        {
-            $this->method = "POST";
-            self::verifyMethod($request_method, $this->method);
-
-            if($this->dados['amount'] <= 0)
-            {
-                ResponseService::send(
-                    "The minimum quantity for purchasing a product is one unit!",
-                    400
-                );
-            }
-
-            $verifyProduct_id = $this->products_model->existsProduct($this->dados['product_id']);
-
-            if(!$verifyProduct_id)
-            {
-                ResponseService::send(
-                    "Invalid Product Identification!",
-                    400
-                );
-            }
-
-
-            $verifySales_id = self::existsSales($this->dados['sales_id']);
-
-            if(!$verifySales_id)
-            {
-                ResponseService::send(
-                    "Invalid Product Identification!",
-                    400
-                );
-            }
-
-            $insert = $this->sales_products_model->insert($this->dados['product_id'], $this->dados['sales_id'], $this->dados['amount']);
-
-            if(!$insert)
-            {
-                ResponseService::send(
-                    "Unable to insert sale item!",
-                    422
-                );
-            }
-
-            ResponseService::send(
-                "Another item for sale has been added whose ID is => ".$this->dados['sales_id'],
-                202
-            );
-
-
-        }
+       
 
         private function verifyMethod(string $request_method,string $method) : void
         {

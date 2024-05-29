@@ -23,7 +23,7 @@
              $this->table = "sales";
         }
 
-        protected function existsSales(int $id)
+        public function getOneSalesByID(int $id)
         {
             $query = "SELECT * FROM `".$this->table."` WHERE id = :id ";
             try
@@ -49,7 +49,7 @@
             }
         }
 
-        protected function insert(int $user_id)
+        protected function insertSales(int $user_id)
         {
             $query = "INSERT INTO `" .$this->table . "`
             ( user_id ) VALUES ( :user_id)";
