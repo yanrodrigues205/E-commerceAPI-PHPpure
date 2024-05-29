@@ -52,3 +52,8 @@ However, it is important to note that the Factory Method pattern can also introd
 | `/users/add`   | POST |Creating a new user within the system.                 |`false` |
 | `/users/signin`   | POST |Session creator within the system, making it possible to enter private routes.|`false` |
 | `/products/getall`   | GET | Responsible for presenting all products available in the system.|`false` |
+| `/products/insert`   | POST | Responsible for creating new products within the system.|`true` |
+| `/products/delete/:id`   | DELETE | Responsible for deleting a specific product within the system..|`true` |
+| `/sales/insert`   | POST | Start a sale in e-commerce |`true` |
+| `/sales_products/insert`   | POST | Insert an item to an initialized sale. |`true` |
+| `/sales_products/delete/:id`   | DELETE | Exclude a product that is related to a sale. |`true` |
