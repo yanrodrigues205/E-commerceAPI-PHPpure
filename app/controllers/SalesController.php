@@ -19,7 +19,7 @@
         }
 
 
-        public function insert($request_method) : void
+        public function init($request_method) : void
         {
             $this->method = "POST";
             self::verifyMethod($request_method, $this->method);
@@ -43,7 +43,7 @@
 
 
 
-            $insert = self::insertSales($this->dados['user_id']);
+            $insert = self::initSales($this->dados['user_id']);
 
             if(!$insert)
             {
@@ -59,6 +59,37 @@
             );
 
 
+        }
+
+
+        public function end($request_method)
+        {
+            $this->method = "POST";
+            self::verifyMethod($request_method, $this->method);
+            
+
+            if(empty($this->dados["sales_id"]) || $this->dados["sales_id"] > 0 || empty($this->dados["payment"]))
+            {
+                ResponseService::send(
+                    "To complete the precise insertion of the fields (sales_id, payment).",
+                    400
+                );
+            }
+
+            $finish = self::endSales($this->dados["sales_id"], $this->dados["payment"]);
+
+            if(!$finish)
+            {
+                ResponseService::send(
+                    "We were unable to end the sale!",
+                    400
+                );
+            }
+
+            ResponseService::send(
+                "Sale completed successfully!",
+                200
+            );
         }
 
 

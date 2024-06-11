@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS products(
 CREATE TABLE IF NOT EXISTS sales(
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT NOT NULL,
-    `payament` ENUM("Pix", "Crédito", "Débito", "Boleto Bancário", "Cheque"),
+    `payment` ENUM("Pix", "Crédito", "Débito", "Boleto Bancário", "Cheque"),
     `total_price` DOUBLE,
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

@@ -45,11 +45,12 @@
             }
             catch(Exception $err)
             {
-                echo "New exception in ProductRepository, Exception => ".$err;
+                echo "New exeption in Sales Model, Exception => ".$err;
+                return false;
             }
         }
 
-        protected function insertSales(int $user_id)
+        protected function initSales(int $user_id) : bool
         {
             $query = "INSERT INTO `" .$this->table . "`
             ( user_id ) VALUES ( :user_id)";
@@ -63,7 +64,61 @@
             }
             catch(Exception $err)
             {
-                echo "New exeption in Sales Repository, Exception => ".$err;
+                echo "New exeption in Sales Model, Exception => ".$err;
+                return false;
+            }
+        }
+
+
+        protected function endSales(int $sales_id, string $payment) : bool
+        {
+            $select_sales_products = "SELECT 
+                                        products.name, 
+                                        products.description, 
+                                        products.value, 
+                                        sales_products.amount, 
+                                        (sales_products.amount * products.value) AS item_value 
+                                        FROM sales_products 
+                                        INNER JOIN products 
+                                        ON sales_products.product_id = products.id 
+                                        WHERE sales_products.sales_id = :sales_id";
+
+            $query = "UPDATE `".$this->table."` 
+            SET total_price = :total_price, payment = :payment 
+            WHERE id = :id";
+
+            try
+            {
+                $prepare_select = $this->database->prepare($select_sales_products);
+                $prepare_select->bindParam(":sales_id", $sales_id);
+
+                $prepare_select->execute();
+                $all_select = $prepare_select->fetchAll($this->database::FETCH_ASSOC);
+
+                if(count($all_select) > 0)
+                {
+                    $total = 0;
+                    for($i = 0; $i < count($all_select); $i++)
+                    {
+                        $total += $all_select[$i]["item_value"];
+                    }
+               
+                    $prepare = $this->database->prepare($query);
+                    $prepare->bindParam(":id", $sales_id);
+                    $prepare->bindParam(":total_price", $total);
+                    $prepare->bindParam(":payment", $payment);
+                    $result = $prepare->execute();
+                    return $result;
+
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch(Exception $err)
+            {
+                echo "New exeption in Sales Model, Exception => ".$err;
                 return false;
             }
         }
