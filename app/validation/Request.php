@@ -20,7 +20,7 @@
 
         public function processRequest()
         {
-            $retorno = utf8_encode(GlobalConstants::MSG_ROUTE_ERROR);
+            $retorno = utf8_encode(GlobalConstants::MESSAGE_INVALID_TYPE_REQUEST);
 
             if(in_array($this->request['method'], GlobalConstants::REQUEST_TYPE, true)) //checked method is authorized
             {

@@ -11,4 +11,6 @@
         public const REQUEST_PUT = ['USERS', 'PRODUCTS', 'SALES']; //alt
         public const REQUEST_DELETE = ['USERS', 'PRODUCTS', 'SALES'];
 
+
+        public const MESSAGE_INVALID_TYPE_REQUEST = "Check the type of request made (POST, GET, PUT, DELETE)";
     }
