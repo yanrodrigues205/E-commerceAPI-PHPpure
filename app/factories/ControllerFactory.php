@@ -21,7 +21,6 @@
                 }
 
                 $obj = new $controller($body_request);
-                echo $method;
                 if(method_exists($obj, $method))
                 {
                     $call = $obj->$method($request_type);
