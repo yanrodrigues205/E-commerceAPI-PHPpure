@@ -10,7 +10,7 @@
         }
         public static function callController(string $controller, string $method,string $request_type, $body_request, int $id_in_url)
         {
-            $controller_name =  $controller . "Controller";
+            $controller_name =  ucfirst(strtolower($controller)) . "Controller";
             $controller = "controllers\\".$controller_name;
 
             if(class_exists($controller))
@@ -21,6 +21,7 @@
                 }
 
                 $obj = new $controller($body_request);
+                echo $method;
                 if(method_exists($obj, $method))
                 {
                     $call = $obj->$method($request_type);
