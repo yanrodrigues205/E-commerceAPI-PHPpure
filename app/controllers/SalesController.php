@@ -53,12 +53,15 @@
                 );
             }
 
-            ResponseService::send(
-                "Sale started successfully!",
-                200
-            );
 
-
+            header("HTTP/1.1 200 OK");
+            $message = [
+                "message" => "Sale started successfully!",
+                "id" => $insert,
+                "status" => 200
+            ];
+            echo json_encode($message);
+            exit;
         }
 
 

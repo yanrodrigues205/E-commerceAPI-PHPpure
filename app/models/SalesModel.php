@@ -50,7 +50,7 @@
             }
         }
 
-        protected function initSales(int $user_id) : bool
+        protected function initSales(int $user_id) : int | false
         {
             $query = "INSERT INTO `" .$this->table . "`
             ( user_id ) VALUES ( :user_id)";
@@ -60,7 +60,10 @@
                 $result->bindParam(":user_id", $user_id);
                 $results = $result->execute();
 
-                return $results;
+                // Obtém o ID do último registro inserido
+                $lastInsertId = $this->database->lastInsertId();
+
+                return $lastInsertId ? (int)$lastInsertId : false;
             }
             catch(Exception $err)
             {
