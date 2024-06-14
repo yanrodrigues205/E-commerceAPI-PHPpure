@@ -105,6 +105,7 @@
                 $message = [
                     "message" => "User logged in successfully!",
                     "status" => 200,
+                    "id" => $verifyCredentials[0]->id,
                     "token" => $create_token
                 ];
                 echo json_encode($message);
