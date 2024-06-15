@@ -8,7 +8,7 @@
         private PDO $database;
         private string $table;
 
-        protected function __construct()
+        public function __construct()
         {
             /**
              * @name {MySql} - connection to database
