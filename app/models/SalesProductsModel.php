@@ -24,7 +24,7 @@
              $this->table = "sales_products";
         }
 
-        protected function insertSalesProducts(int $product_id, int $sales_id, int $amount) : bool
+        protected function insertSalesProducts(int $product_id, int $sales_id, int $amount) : int | false
         {
             $query = "INSERT INTO `" .$this->table . "`
             ( product_id, sales_id, amount ) VALUES ( :product_id, :sales_id, :amount )";
@@ -36,7 +36,10 @@
                 $result->bindParam(":amount", $amount);
                 $results = $result->execute();
 
-                return $results;
+                $lastInsertId = $this->database->lastInsertId();
+
+                return $lastInsertId ? (int)$lastInsertId : false;
+
             }
             catch(Exception $err)
             {
@@ -49,17 +52,17 @@
         {
             $data =[];
 
-            if(!empty($product_id))
+            if(!empty($product_id) && !$product_id)
             {
                 $data["product_id"] = $product_id;
             }
 
-            if(!empty($amount))
+            if(!empty($amount) && !$amount)
             {
                 $data["amount"] = $amount;
             }
 
-            if(!empty($sales_id))
+            if(!empty($sales_id) && !$sales_id)
             {
                 $data["sales_id"] = $sales_id;
             }
@@ -83,9 +86,9 @@
 
                 foreach($data as $key_array => $value_array)
                 {
-                    $prepare->bindParam(":".$key_array, $value_array);
+                    $prepare->bindValue(":".$key_array, $value_array);
                 }
-                $prepare->bindParam(":id", $sales_products_id);
+                $prepare->bindValue(":id", $sales_products_id);
                 $result = $prepare->execute();
                 return $result;
             }

@@ -20,7 +20,7 @@
             parent::__construct();
         }
 
-        public function insertSales($request_method) : void
+        public function insert(string $request_method) : void
         {
             $this->method = "POST";
             self::verifyMethod($request_method, $this->method);
@@ -64,12 +64,14 @@
                 );
             }
 
-            ResponseService::send(
-                "Another item for sale has been added whose ID is => ".$this->dados['sales_id'],
-                202
-            );
-
-
+            header("HTTP/1.1 200 OK");
+            $message = [
+                "message" => "Another item for sale has been added whose ID is => ".$this->dados['sales_id'],
+                "id" => $insert,
+                "status" => 200
+            ];
+            echo json_encode($message);
+            exit;
         }
 
         private function verifyMethod(string $request_method,string $method) : void
