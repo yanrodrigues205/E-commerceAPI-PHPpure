@@ -2,6 +2,9 @@
     namespace controllers;
     use models\ProductsModel;
     use services\ResponseService;
+    use adapters\JsonToFileAdapter;
+use EmptyIterator;
+
     class ProductsController extends ProductsModel
     {
         private $dados;
@@ -21,12 +24,43 @@
 
         public function getall($request_method) : void
         {
-            $this->method = "GET";
+            $this->method = "POST";
             self::verifyMethod($request_method, $this->method);
+            $get = json_encode(self::AllProducts());
 
-            $get = self::AllProducts();
-            echo json_encode($get);
 
+            $path_json = "./export/json/file_".uniqid().".json";
+            $path_csv = "./export/csv/file_".uniqid().".csv";
+    
+
+            if(!empty($this->dados["convert"]))
+            {
+                $adapter = new JsonToFileAdapter($path_json, $path_csv);
+
+                
+                if($this->dados["convert"] == "json")
+                {
+                    $file = $adapter->saveJsonToFile($get);
+                }
+                else if($this->dados["convert"] == "csv")
+                {
+                    $file = $adapter->convertJsonToCSV($get);
+                }
+                $protocol = isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === "on" ? "https" : "http";
+
+                $folder = str_replace("/products/getall", "", $_SERVER["REQUEST_URI"]);
+                if($file)
+                {
+                    $file = str_replace("./", "", $file);
+                    $url = $protocol . "://" . $_SERVER["HTTP_HOST"] . $folder . "/". $file;
+                    echo json_encode(array("message" => "File converted to '".$this->dados["convert"]."' successfully!", "url" => $url));
+                    return;
+                }
+            }
+
+          
+            echo $get;
+            return;
         }
 
         public function insert($request_method) : void
