@@ -71,7 +71,7 @@
             self::verifyMethod($request_method, $this->method);
             
 
-            if(empty($this->dados["sales_id"]) || $this->dados["sales_id"] > 0 || empty($this->dados["payment"]))
+            if(empty($this->dados["sales_id"]) || $this->dados["sales_id"] <= 0 || empty($this->dados["payment"]))
             {
                 ResponseService::send(
                     "To complete the precise insertion of the fields (sales_id, payment).",

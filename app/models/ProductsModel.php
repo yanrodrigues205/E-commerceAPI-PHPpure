@@ -144,7 +144,7 @@
             }
             catch(Exception $err)
             {
-                echo "New exception in ProductRepository, Exception => ".$err;
+                //echo "New exception in ProductRepository, Exception => ".$err;
                 return false;
             }
         }
@@ -165,7 +165,7 @@
             }
             catch(Exception $err)
             {
-                echo "New exception in ProductRepository, Exception => ".$err;
+                //echo "New exception in ProductRepository, Exception => ".$err;
                 return false;
             }
         }

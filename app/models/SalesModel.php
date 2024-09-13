@@ -87,7 +87,7 @@
                                         WHERE sales_products.sales_id = :sales_id";
 
             $query = "UPDATE `".$this->table."` 
-            SET total_price = :total_price, payment = :payment 
+            SET total_price = :total_price, payament = :payment 
             WHERE id = :id";
 
             try
