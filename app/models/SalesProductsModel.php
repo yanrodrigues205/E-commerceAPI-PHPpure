@@ -123,7 +123,13 @@
             {
                 $prepare = $this->database ->prepare($query);
                 $prepare->bindParam(":sales_id", $sales_id);
-                $result = $prepare->execute();
+                $prepare->execute();
+                $result = $prepare->fetchAll($this->database::FETCH_ASSOC);
+                
+                if(count($result) <= 0)
+                {
+                    return false;
+                }
                 return $result;
             }
             catch(Exception $err)

@@ -96,7 +96,24 @@
         }
 
 
-       
+       public function getall(string $request_method)
+       {
+            $this->method = "POST";
+            self::verifyMethod($request_method, $this->method);
+
+
+            $get = self::getAllSales();
+            if(!$get || count($get) <= 0)
+            {
+                ResponseService::send(
+                    "No available sales found",
+                    422
+                );
+            }
+
+            echo json_encode($get);
+            exit;
+       }
 
         private function verifyMethod(string $request_method,string $method) : void
         {

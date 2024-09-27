@@ -72,7 +72,31 @@
             }
         }
 
+        protected function getAllSales() : mixed
+        {
+            $query = "SELECT * FROM `".$this->table."`";
+            try
+            {
+                $prepare = $this->database->prepare($query);
+                $prepare->execute();
+                $all = $prepare->fetchAll($this->database::FETCH_ASSOC);
 
+                if(count($all) > 0)
+                {
+                    return $all;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+            catch(Exception $err)
+            {
+                echo "New exeption in Sales Model, Exception => ".$err;
+                return false;
+            }
+        }
         protected function endSales(int $sales_id, string $payment) : bool
         {
             $select_sales_products = "SELECT 

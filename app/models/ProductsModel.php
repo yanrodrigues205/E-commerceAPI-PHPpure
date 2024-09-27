@@ -127,7 +127,7 @@
             }
         }
 
-        public function existsProduct(int $id) : mixed
+        protected function getOneById(int $id) : mixed
         {
             $query = "SELECT * FROM `".$this->table."` WHERE id = :id ";
             try
@@ -138,7 +138,7 @@
                 $all = $prepare->fetchAll($this->database::FETCH_ASSOC);
 
                 if(count($all) > 0)
-                    return true;
+                    return $all[0];
                 else
                     return false;
             }

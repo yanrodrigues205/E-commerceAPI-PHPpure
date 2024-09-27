@@ -4,19 +4,20 @@
     use services\ResponseService;
     use models\SalesModel;
     use models\ProductsModel;
+    use controllers\ProductsController;
 
     class SalesProductsController extends SalesProductsModel
     {
         private array $dados;
-        private ProductsModel $products_model;
 
         private SalesModel $sales_model;
+        private ProductsController $products_controller;
         private ?string $method;
         public function __construct($dados = [])
         {
             $this->dados = $dados;
-            $this->products_model = new ProductsModel();
             $this->sales_model = new SalesModel();
+            $this->products_controller = new ProductsController();
             parent::__construct();
         }
 
@@ -33,7 +34,10 @@
                 );
             }
 
-            $verifyProduct_id = $this->products_model->existsProduct($this->dados['product_id']);
+            
+            $data = array("product_id" => $this->dados["product_id"]);
+            $this->products_controller->setData($data);
+            $verifyProduct_id = $this->products_controller->getone("GET", true);
 
             if(!$verifyProduct_id)
             {
@@ -74,6 +78,47 @@
             exit;
         }
 
+
+        public function getall($request_method)
+        {
+            $this->method = "POST";
+            self::verifyMethod($request_method, $this->method);
+
+            if(empty($this->dados["sales_id"]) || $this->dados["sales_id"] <= 0)
+            {
+                ResponseService::send(
+                    "For this operation a sales ID is required",
+                    422
+                );
+            }
+
+            $get =  self::getAllSalesProductBySalesID($this->dados["sales_id"]);
+
+
+            for($i = 0; $i < count($get); $i++)
+            {
+                $data = array("product_id" => $get[$i]["product_id"]);
+                $this->products_controller->setData($data);
+                $product = $this->products_controller->getone("GET", true);
+                $sum_of_values = $product["value"] * $get[$i]["amount"];
+                $get[$i]["product_name"] = $product["name"];
+                $get[$i]["product_description"] = $product["description"];
+                $get[$i]["product_value"] = $product["value"];
+                $get[$i]["product_sum_of_values"] = $sum_of_values;
+            }
+
+            if(count($get) <= 0)
+            {
+                ResponseService::send(
+                    "No items found for sale!",
+                    422
+                );
+            }
+
+            echo json_encode($get);
+            exit;
+        }
+
         private function verifyMethod(string $request_method,string $method) : void
         {
             if($request_method != $method)
@@ -86,4 +131,3 @@
         }
 
     }
-?>

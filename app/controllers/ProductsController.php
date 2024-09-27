@@ -17,7 +17,15 @@ use EmptyIterator;
             parent::__construct();
         }
 
+        public function setData(array $data)
+        {
+            $this->dados = $data;
+        }
 
+        public function getData()
+        {
+            return $this->dados;
+        }
         /**
          * @param string $request_method = GET|POST|PUT|DELETE...
          */
@@ -147,7 +155,7 @@ use EmptyIterator;
                 );
             }
 
-            $verify_id = self::existsProduct($this->dados["id"]);
+            $verify_id = self::getOneById($this->dados["id"]);
 
             if(!$verify_id)
             {
@@ -173,7 +181,36 @@ use EmptyIterator;
             );
         }
 
+        public function getone(string $request_method, bool $internal_use = false): string | array
+        {
+            $this->method = "GET";
+            self::verifyMethod($request_method, $this->method);
 
+            if(empty($this->dados["product_id"]) || $this->dados["product_id"]  <= 0)
+            {
+                ResponseService::send(
+                    "You need the product ID to search",
+                    422
+                );
+            }
+
+            $getone = self::getOneById($this->dados["product_id"]);
+
+            if(!$getone)
+            {
+                ResponseService::send(
+                    "No product with this identification was found",
+                    422
+                );
+            }
+
+            if(!$internal_use)
+                echo json_encode($getone);
+            else
+                return $getone;
+
+            exit;
+        }
 
         private function verifyMethod(string $request_method,string $method) : void
         {
