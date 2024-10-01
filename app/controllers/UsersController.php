@@ -21,7 +21,7 @@
          * @param string $request_method = GET|POST|PUT|DELETE...
          */
 
-        public function add($request_method) : void
+        public function add(string $request_method) : void
         {
             $this->method = "POST";
             self::verifyMethod($request_method, $this->method);
@@ -65,7 +65,7 @@
 
         }
 
-        public function signin($request_method):void
+        public function signin(string $request_method):void
         {
             $this->method = "POST";
             self::verifyMethod($request_method, $this->method);
@@ -120,6 +120,105 @@
                 );
             }
 
+        }
+
+        public function getall(string $request_method, bool $internal_use = false) : mixed
+        {
+            $this->method = "GET";
+            self::verifyMethod($request_method, $this->method);
+
+            $getall = self::getAllUsers();
+
+            if(!$internal_use)
+            {
+                echo json_encode($getall);
+                exit;
+            }
+            else
+            {
+                return $getall;
+            }
+        }
+
+        public function delete(string $request_method) : void
+        {
+            $this->method = "DELETE";
+            self::verifyMethod($request_method, $this->method);
+
+            if(empty($this->dados["user_id"]) || $this->dados["user_id"] <= 0)
+            {
+                ResponseService::send(
+                    "A user ID is required to complete the operation(user_id).",
+                    422
+                );
+            }
+
+
+            $response = self::deleteById($this->dados["user_id"]);
+            if(!$response)
+            {
+                ResponseService::send(
+                    "Unable to delete this user.",
+                    422
+                );
+            }
+
+            if($response === 23000)
+            {
+                ResponseService::send(
+                    "You cannot delete this user as he is a reference in other situations",
+                    400
+                );
+            }
+
+            if($response)
+            {
+                ResponseService::send(
+                    "User ID => ".$this->dados["user_id"]." has been successfully deleted!",
+                    422
+                );
+            }
+        }
+
+        public function update(string $request_method) : void
+        {
+            $this->method = "PUT";
+            self::verifyMethod($request_method, $this->method);
+
+            if(empty($this->dados["id"]) || $this->dados["id"] <= 0)
+            {
+                ResponseService::send(
+                    "To change a user, it is necessary to provide the user's identification(ID).",
+                    400
+                );
+            }
+
+            if(empty($this->dados["name"]) && empty($this->dados["email"]) && empty($this->dados["password"]))
+            {
+                ResponseService::send(
+                    "To change a user, it is necessary to provide the user's identification(ID).",
+                    400
+                );
+            }
+
+            $this->dados["name"] = $this->dados["name"] ? $this->dados["name"] : false;
+            $this->dados["email"] = $this->dados["email"] ? $this->dados["email"] : false;
+            $this->dados["password"] = $this->dados["password"] ? $this->dados["password"] : false;
+
+            $update = self::updateById($this->dados["id"], $this->dados["name"], $this->dados["email"], $this->dados["password"]);
+
+            if(!$update)
+            {
+                ResponseService::send(
+                    "Unable to complete user change!",
+                    400
+                );
+            }
+
+            ResponseService::send(
+                "User identification (ID) => '".$this->dados["id"]."' has been changed successfully!",
+                200
+            );
         }
 
         private function verifyMethod(string $request_method,string $method) : void
