@@ -3,6 +3,9 @@
     use PDO;
     use Exception;
     use database\MySql;
+    use services\coupon\PercentageDiscount;
+    use services\coupon\ValueDiscount;
+
     class SalesModel
     {
         private PDO $database;
@@ -97,7 +100,7 @@
                 return false;
             }
         }
-        protected function endSales(int $sales_id, string $payment) : bool
+        protected function endSales(int $sales_id, string $payment, ?string $coupon = null) : bool
         {
             $select_sales_products = "SELECT 
                                         products.name, 
@@ -111,8 +114,11 @@
                                         WHERE sales_products.sales_id = :sales_id";
 
             $query = "UPDATE `".$this->table."` 
-            SET total_price = :total_price, payament = :payment 
+            SET total_price = :total_price, payment = :payment
             WHERE id = :id";
+
+
+        
 
             try
             {
@@ -128,6 +134,12 @@
                     for($i = 0; $i < count($all_select); $i++)
                     {
                         $total += $all_select[$i]["item_value"];
+                    }
+
+                    if($coupon)
+                    {
+                        //printf("\nEntrou na sessão de setar cupoms!!");
+                        $total = $this->applyCoupon($total, $coupon);
                     }
                
                     $prepare = $this->database->prepare($query);
@@ -149,4 +161,23 @@
                 return false;
             }
         }
+
+        private function applyCoupon(float $total, string $coupon) : float
+        {
+            $coupons = [
+                "BlackFriday" => new PercentageDiscount(10),
+                "Natal2024" => new ValueDiscount(20)
+            ];
+
+
+            if(!isset($coupons[$coupon]))
+            {
+                printf("\nO cupom de desconto '{$coupon}' é inválido, tente outro novamente.");
+                return $total;
+            }
+
+            $discount = $coupons[$coupon];
+            return $discount->calculateDiscount($total);
+        }
+
     }

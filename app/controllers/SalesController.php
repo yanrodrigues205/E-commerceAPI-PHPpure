@@ -73,13 +73,25 @@
 
             if(empty($this->dados["sales_id"]) || $this->dados["sales_id"] <= 0 || empty($this->dados["payment"]))
             {
+                echo "AAA";
                 ResponseService::send(
                     "To complete the precise insertion of the fields (sales_id, payment).",
                     400
                 );
             }
+            
+            if(!empty($this->dados["coupon"]))
+            {
+                printf("Na finalização da venda existe cupom de desconto.");
+                $finish = self::endSales($this->dados["sales_id"], $this->dados["payment"], $this->dados["coupon"]);
+            }
+            else
+            {
+                printf("Na finalização da venda não existe cupom de desconto.");
+                $finish = self::endSales($this->dados["sales_id"], $this->dados["payment"]);
+            }
 
-            $finish = self::endSales($this->dados["sales_id"], $this->dados["payment"]);
+            
 
             if(!$finish)
             {
