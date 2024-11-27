@@ -34,7 +34,16 @@ use EmptyIterator;
         {
             $this->method = "POST";
             self::verifyMethod($request_method, $this->method);
-            $get = json_encode(self::AllProducts());
+
+
+            if(!empty($this->dados["strategy"]))
+            {
+                $get = json_encode(self::AllProducts($this->dados["strategy"]));
+            }
+            else
+            {
+               $get = json_encode(self::AllProducts());
+            }
 
 
             $path_json = "./export/json/file_".uniqid().".json";
@@ -65,6 +74,8 @@ use EmptyIterator;
                     return;
                 }
             }
+
+            
 
           
             echo $get;

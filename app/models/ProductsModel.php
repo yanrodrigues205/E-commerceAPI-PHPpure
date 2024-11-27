@@ -3,6 +3,8 @@
     use PDO;
     use database\MySql;
     use Exception;
+    use strategy\BubbleSortStrategy;
+    use strategy\QuickSortStrategy;
 
     class ProductsModel
     {
@@ -24,7 +26,7 @@
             $this->table = "products";
         }
 
-        protected function AllProducts() : array
+        protected function AllProducts(string $strategy = "") : array
         {
             $query = "SELECT * FROM " . $this->table;
 
@@ -32,6 +34,25 @@
             {
                 $prepare = $this->database->query($query);
                 $all = $prepare->fetchAll($this->database::FETCH_ASSOC);
+
+                if($strategy)
+                {   $algoritmo = "";
+                    if($strategy == "bubble")
+                    {
+                        $algoritmo = new BubbleSortStrategy();
+                    }
+                    else if ($strategy == "quick")
+                    {
+                        $algoritmo = new QuickSortStrategy();
+                    }
+                    else
+                    {
+                        printf("Algoritmo de organização não identificado!");
+                        return $all;
+                    }
+                    $all = $algoritmo->sort($all, "value");
+                }
+
                 return $all;
             }
             catch(Exception $err)
